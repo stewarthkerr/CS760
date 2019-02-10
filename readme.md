@@ -1,1 +1,1 @@
-CS760: Machine Learning
+UW-Madison CS760: Machine Learning
