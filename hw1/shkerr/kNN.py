@@ -1,8 +1,8 @@
 #!/usr/bin/python3.6
 import json
 import numpy as np
-test = "./data/votes_test.json"
-train = "./data/votes_train.json"
+test = "./data/digits_test.json"
+train = "./data/digits_train.json"
 k = 5
 
 #Maybe create a dataset object instead
@@ -26,6 +26,22 @@ nFeat = len(test['metadata']['features'])
 
 #Compute mean for each feature from training set (only for continuous features)
 #Compute stddev for each feature from training set (only for numeric)
+mean = np.zeros((nFeat))
+stddev = np.zeros((nFeat))
+for k in range(0,nFeat):
+    if test['metadata']['features'][k][1] == 'numeric':
+        sum = 0
+        for j in range(0,nTrain):
+            sum += train['data'][j][k]
+        mean[k] = sum/nTrain #Maybe need to do a +1 here?
+        sqerror = 0
+        for j in range(0,nTrain):
+            sqerror += (train['data'][j][k]-mean[k])**2
+        stddev[k] = np.sqrt(sqerror/nTrain)
+        if stddev[k] == 0: stddev[k] = 1
+        print("k ",k," Mean ",mean[k]," Stdev ",stddev[k])
+
+time.sleep(50)
 #Standardize both training set and test set
 
 #Initialize distance array 
@@ -37,7 +53,7 @@ for i in range(0,nTest):
         #Loop through each feature
         for k in range(0,nFeat):
             if test['metadata']['features'][k][1] == 'numeric':
-                #Calculate numeric distance
+                #Calculate numeric distance after standardizing
                 distance[i][j] += abs(test['data'][i][k]-train['data'][j][k]) 
             elif test['data'][i][k] != train['data'][j][k]:
                 #Calculate categorical distance
