@@ -1,5 +1,6 @@
 #!/usr/bin/python3.6
 import json
+import numpy as np
 test = "./data/votes_test.json"
 train = "./data/votes_train.json"
 k = 5
@@ -28,15 +29,18 @@ nFeat = len(test['metadata']['features'])
 #Standardize both training set and test set
 
 #Initialize distance array 
-distance=[[0 for i in range(0,nTrain)] for j in range(0,nTest)]
+distance = np.zeros((nTest,nTrain))
 #Loop through test set
 for i in range(0,nTest):
     #Loop through train set
     for j in range(0,nTrain):
-        distance[i][j]=0
         #Loop through each feature
         for k in range(0,nFeat):
-            if test['data'][i][k] != train['data'][j][k]:
+            if test['metadata']['features'][k][1] == 'numeric':
+                #Calculate numeric distance
+                distance[i][j] += abs(test['data'][i][k]-train['data'][j][k]) 
+            elif test['data'][i][k] != train['data'][j][k]:
+                #Calculate categorical distance
                 distance[i][j] += 1
         print("The distance for",i," ",j,":",distance[i][j])
         
