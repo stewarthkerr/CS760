@@ -2,6 +2,7 @@
 import json
 import numpy as np
 import sys
+import time
 test = "./data/digits_test.json"
 train = "./data/digits_train.json"
 k = 5
@@ -30,31 +31,48 @@ nFeat = len(metadata)-1 #-1 to remove label
 #Compute stddev for each feature from training set (only for numeric)
 mean = np.zeros((nFeat))
 stddev = np.zeros((nFeat))
-for k in range(0,nFeat):
-    if metadata[k][1] == 'numeric':
-        sum = np.sum(train.T[k], axis = 0) #sums all observations for a specific feature
-        mean[k] = sum/nTrain #Maybe need to do a +1 here?
-        sqerror = np.sum((train.T[k]-mean[k])**2)
-        stddev[k] = np.sqrt(sqerror/nTrain)
-        if stddev[k] == 0: stddev[k] = 1
-        print("k ",k," Mean ",mean[k]," Stdev ",stddev[k])
-        train[:][k] = (train[:][k] - mean[k])/stddev[k] #standardize train set
-        test[:][k] = (test[:][k] - mean[k])/stddev[k]   #standardize test set
+for feat in range(0,nFeat):
+    if metadata[feat][1] == 'numeric':
+        sum = np.sum(train.T[feat], axis = 0) #sums all observations for a specific feature
+        mean[feat] = sum/nTrain #Maybe need to do a +1 here?
+        sqerror = np.sum((train.T[feat]-mean[feat])**2)
+        stddev[feat] = np.sqrt(sqerror/nTrain)
+        if stddev[feat] == 0: stddev[feat] = 1
+        train[:][feat] = (train[:][feat] - mean[feat])/stddev[feat] #standardize train set
+        test[:][feat] = (test[:][feat] - mean[feat])/stddev[feat]   #standardize test set
 
-#Initialize distance array 
+#Initialize distance/nn array 
 distance = np.zeros((nTest,nTrain))
+smallest = np.ones((nTest,k))*np.inf
+nn = np.zeros((nTest,k))
 #Loop through test set
 for i in range(0,nTest):
     #Loop through train set
     for j in range(0,nTrain):
         #Loop through each feature
-        for k in range(0,nFeat):
-            if metadata[k][1] == 'numeric':
-                #Calculate numeric distance after standardizing
-                distance[i][j] += abs(test[i][k]-train[j][k]) 
-            elif test[i][k] != train[j][k]:
+        for feat in range(0,nFeat):
+            if metadata[feat][1] == 'numeric':
+                #Calculate numeric distance
+                distance[i][j] += abs(test[i][feat]-train[j][feat]) 
+            elif test[i][feat] != train[j][feat]:
                 #Calculate categorical distance
                 distance[i][j] += 1
-        print("The distance for",i," ",j,":",distance[i][j])
+        if distance[i][j] < smallest[i][k-1]:
+            smallest[i][k-1] = distance[i][j]
+            nn[i][k-1] = j #THIS IS WRONG
+            smallest[i] = np.sort(smallest[i]) 
+        #print("The distance for",i," ",j,":",distance[i][j])
+        print(i, " The smallest distances: ", smallest[i],"---- The nearest neighbors: ",nn[i])
 
-        
+""" 
+#Loop through feature
+for k in range(0,nFeat):
+    #Loop through test set
+    for i in range(0,nTest):
+        if metadata[k][1] == 'numeric':
+            #calculate numeric distance
+            print('true')
+        elif test[i][k] != train.T[k]: distance[i][:][k] = 1
+            #calculate categorical distance
+            #distance[i][:][k] = int(test[i][k] == train[:][k])
+"""
