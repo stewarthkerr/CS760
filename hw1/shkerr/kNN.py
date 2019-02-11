@@ -1,6 +1,7 @@
 #!/usr/bin/python3.6
 import json
 import numpy as np
+import sys
 test = "./data/digits_test.json"
 train = "./data/digits_train.json"
 k = 5
@@ -8,15 +9,16 @@ k = 5
 #Maybe create a dataset object instead
 
 #Load the data in
-with open(test,"r") as read_file:
-    test = json.load(read_file)
 with open(train,"r") as read_file:
     train = json.load(read_file)
-nTest = len(test['data'])
-nTrain = len(train['data'])
-nFeat = len(test['metadata']['features'])
-
-#Get length of test
+    metadata = np.array(train['metadata']['features'])
+    train = np.array(train['data'])
+with open(test,"r") as read_file:
+    test = json.load(read_file)
+    test = np.array(test['data'])
+nTest = len(test)
+nTrain = len(train)
+nFeat = len(metadata)-1 #-1 to remove label
 
 #test['metadata'] holds the metadata
 #test['data'] holds the data
@@ -40,9 +42,10 @@ for k in range(0,nFeat):
         stddev[k] = np.sqrt(sqerror/nTrain)
         if stddev[k] == 0: stddev[k] = 1
         print("k ",k," Mean ",mean[k]," Stdev ",stddev[k])
+        
 
-time.sleep(50)
-#Standardize both training set and test set
+#Standardize both training set and test set - maybe can move to loop later
+
 
 #Initialize distance array 
 distance = np.zeros((nTest,nTrain))
@@ -53,6 +56,7 @@ for i in range(0,nTest):
         #Loop through each feature
         for k in range(0,nFeat):
             if test['metadata']['features'][k][1] == 'numeric':
+                #sum = np.sum(train['data'], axis = 0)
                 #Calculate numeric distance after standardizing
                 distance[i][j] += abs(test['data'][i][k]-train['data'][j][k]) 
             elif test['data'][i][k] != train['data'][j][k]:
