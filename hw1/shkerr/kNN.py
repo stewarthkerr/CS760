@@ -31,14 +31,12 @@ nFeat = len(metadata)-1 #-1 to remove label
 mean = np.zeros((nFeat))
 stddev = np.zeros((nFeat))
 for k in range(0,nFeat):
-    if test['metadata']['features'][k][1] == 'numeric':
-        sum = 0
-        for j in range(0,nTrain):
-            sum += train['data'][j][k]
+    if metadata[k][1] == 'numeric':
+        sum = np.sum(train.T[k], axis = 0) #sums all observations for a specific feature
         mean[k] = sum/nTrain #Maybe need to do a +1 here?
-        sqerror = 0
-        for j in range(0,nTrain):
-            sqerror += (train['data'][j][k]-mean[k])**2
+        sqerror = np.sum((train.T[k]-mean[k])**2)
+        #for j in range(0,nTrain):
+        #    sqerror += (train[j][k]-mean[k])**2
         stddev[k] = np.sqrt(sqerror/nTrain)
         if stddev[k] == 0: stddev[k] = 1
         print("k ",k," Mean ",mean[k]," Stdev ",stddev[k])
@@ -55,11 +53,11 @@ for i in range(0,nTest):
     for j in range(0,nTrain):
         #Loop through each feature
         for k in range(0,nFeat):
-            if test['metadata']['features'][k][1] == 'numeric':
+            if metadata[k][1] == 'numeric':
                 #sum = np.sum(train['data'], axis = 0)
                 #Calculate numeric distance after standardizing
-                distance[i][j] += abs(test['data'][i][k]-train['data'][j][k]) 
-            elif test['data'][i][k] != train['data'][j][k]:
+                distance[i][j] += abs(test[i][k]-train[j][k]) 
+            elif test[i][k] != train[j][k]:
                 #Calculate categorical distance
                 distance[i][j] += 1
         print("The distance for",i," ",j,":",distance[i][j])
