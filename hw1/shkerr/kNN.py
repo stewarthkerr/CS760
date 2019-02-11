@@ -35,15 +35,11 @@ for k in range(0,nFeat):
         sum = np.sum(train.T[k], axis = 0) #sums all observations for a specific feature
         mean[k] = sum/nTrain #Maybe need to do a +1 here?
         sqerror = np.sum((train.T[k]-mean[k])**2)
-        #for j in range(0,nTrain):
-        #    sqerror += (train[j][k]-mean[k])**2
         stddev[k] = np.sqrt(sqerror/nTrain)
         if stddev[k] == 0: stddev[k] = 1
         print("k ",k," Mean ",mean[k]," Stdev ",stddev[k])
-        
-
-#Standardize both training set and test set - maybe can move to loop later
-
+        train[:][k] = (train[:][k] - mean[k])/stddev[k] #standardize train set
+        test[:][k] = (test[:][k] - mean[k])/stddev[k]   #standardize test set
 
 #Initialize distance array 
 distance = np.zeros((nTest,nTrain))
@@ -54,13 +50,11 @@ for i in range(0,nTest):
         #Loop through each feature
         for k in range(0,nFeat):
             if metadata[k][1] == 'numeric':
-                #sum = np.sum(train['data'], axis = 0)
                 #Calculate numeric distance after standardizing
                 distance[i][j] += abs(test[i][k]-train[j][k]) 
             elif test[i][k] != train[j][k]:
                 #Calculate categorical distance
                 distance[i][j] += 1
         print("The distance for",i," ",j,":",distance[i][j])
-        
 
-#Calculate Manhattan/Hamming distance for each in test set
+        
