@@ -19,12 +19,6 @@ nTest = len(test)
 nTrain = len(train)
 nFeat = len(metadata)-1 #-1 to remove label
 
-#test['metadata'] holds the metadata
-#test['data'] holds the data
-#test['data'][n] holds the data for observation n
-#len(test['metadata']['features']) gets # of features + class
-#len(test['data']) gets # of observations
-
 #Compute mean for each feature from training set (only for continuous features)
 #Compute stddev for each feature from training set (only for numeric)
 #Split numeric and categorical features
@@ -54,39 +48,20 @@ test_cat = train[:, cat_feat]
 
 #Initialize distance/nn array 
 distance = np.zeros((nTest,nTrain))
-smallest = np.ones((nTest,k))*np.inf
-nn = np.zeros((nTest,k))
+smallest = np.zeros(nTest)
+nn = np.zeros(nTest)
 #Loop through test set
 for i in range(0,nTest):
-    #Loop through train set
-    for j in range(0,nTrain):
-        #Loop through each feature
-        for feat in range(0,nFeat):
-            if metadata[feat][1] == 'numeric':
-                #Calculate numeric distance
-                distance[i][j] += abs(test[i][feat]-train[j][feat]) 
-            elif test[i][feat] != train[j][feat]:
-                #Calculate categorical distance
-                #USE NP.DIFF instead!!!
-                distance[i][j] += 1
-        if distance[i][j] < smallest[i][k-1]:
-            # LOOK INTO USING np.argsort or np.argmin
-            smallest[i][k-1] = distance[i][j]
-            nn[i][k-1] = j #THIS IS WRONG
-            smallest[i] = np.sort(smallest[i]) 
-        #print("The distance for",i," ",j,":",distance[i][j])
-        time.sleep(0.001)
-        print(i, " The smallest distances: ", smallest[i])#,"---- The nearest neighbors: ",nn[i])
-
-""" 
-#Loop through feature
-for k in range(0,nFeat):
-    #Loop through test set
-    for i in range(0,nTest):
-        if metadata[k][1] == 'numeric':
-            #calculate numeric distance
-            print('true')
-        elif test[i][k] != train.T[k]: distance[i][:][k] = 1
-            #calculate categorical distance
-            #distance[i][:][k] = int(test[i][k] == train[:][k])
-"""
+    #Loop through features
+    for feat in range(0,nFeat):
+        if feat in num_feat:
+            #Calculate numeric distance
+            distance[i] += abs(test_num[i][feat]-train_num.T[feat][:])
+        else:
+            #Get an array of differences
+            cat_diff = np.not_equal(test_cat[i][feat], train_cat.T[feat][:], dtype = object)
+            #Add distance back into distance array
+            distance[i] += (cat_diff.astype(int))
+    #Now, sort by distance and select k nearest neighbors
+    smallest = np.argsort(distance[i], axis = 0)
+    nn = smallest[0:k]
