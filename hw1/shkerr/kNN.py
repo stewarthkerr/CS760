@@ -18,6 +18,7 @@ with open(test,"r") as read_file:
 nTest = len(test)
 nTrain = len(train)
 nFeat = len(metadata)-1 #-1 to remove label
+nLabels = len(metadata[nFeat][1])
 
 #Compute mean for each feature from training set (only for continuous features)
 #Compute stddev for each feature from training set (only for numeric)
@@ -46,10 +47,10 @@ train_cat = train[:, cat_feat]
 test_num = test[:, num_feat]
 test_cat = train[:, cat_feat]
 
-#Initialize distance/nn array 
+#Alg to find kNN
 distance = np.zeros((nTest,nTrain))
-smallest = np.zeros(nTest)
-nn = np.zeros(nTest)
+smallest = np.zeros(nTest, dtype = int)
+nn = np.zeros((nTest,k), dtype = int)
 #Loop through test set
 for i in range(0,nTest):
     #Loop through features
@@ -64,4 +65,16 @@ for i in range(0,nTest):
             distance[i] += (cat_diff.astype(int))
     #Now, sort by distance and select k nearest neighbors
     smallest = np.argsort(distance[i], axis = 0)
-    nn = smallest[0:k]
+    nn[i] = smallest[0:k]
+
+votes = np.zeros((nTest,nLabels), dtype = int)
+#Next, I need to let each nn vote:
+for i in range(0,nTest):
+    #Loop through labels
+    for l in range(0,nLabels):
+        #Loop through nn
+        for neighbor in nn[i]:
+            if train[neighbor][nFeat] == metadata[nFeat][1][l]:
+                votes[i][l] += 1
+        #Print vote total after going through all nn
+    print(votes[i],",")
