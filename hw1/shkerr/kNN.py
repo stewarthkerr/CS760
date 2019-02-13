@@ -5,9 +5,7 @@ import sys
 import time
 test = "./data/digits_test.json"
 train = "./data/digits_train.json"
-k = 5
-
-#Maybe create a dataset object instead
+k = 10
 
 #Load the data in
 with open(train,"r") as read_file:
@@ -29,17 +27,30 @@ nFeat = len(metadata)-1 #-1 to remove label
 
 #Compute mean for each feature from training set (only for continuous features)
 #Compute stddev for each feature from training set (only for numeric)
+#Split numeric and categorical features
 mean = np.zeros((nFeat))
 stddev = np.zeros((nFeat))
+num_feat = []
+cat_feat = []
 for feat in range(0,nFeat):
     if metadata[feat][1] == 'numeric':
         sum = np.sum(train.T[feat], axis = 0) #sums all observations for a specific feature
         mean[feat] = sum/nTrain #Maybe need to do a +1 here?
         sqerror = np.sum((train.T[feat]-mean[feat])**2)
         stddev[feat] = np.sqrt(sqerror/nTrain)
-        if stddev[feat] == 0: stddev[feat] = 1
+        if stddev[feat] == 0: 
+            stddev[feat] = 1
         train[:][feat] = (train[:][feat] - mean[feat])/stddev[feat] #standardize train set
         test[:][feat] = (test[:][feat] - mean[feat])/stddev[feat]   #standardize test set
+        num_feat.append(feat) #Builds a list of the indices of numericFeatures
+    else:
+        cat_feat.append(feat) #Builds a list of categorical features
+
+#Split array into numeric and categorical
+train_num = train[:, num_feat]
+train_cat = train[:, cat_feat]
+test_num = test[:, num_feat]
+test_cat = train[:, cat_feat]
 
 #Initialize distance/nn array 
 distance = np.zeros((nTest,nTrain))
@@ -56,13 +67,16 @@ for i in range(0,nTest):
                 distance[i][j] += abs(test[i][feat]-train[j][feat]) 
             elif test[i][feat] != train[j][feat]:
                 #Calculate categorical distance
+                #USE NP.DIFF instead!!!
                 distance[i][j] += 1
         if distance[i][j] < smallest[i][k-1]:
+            # LOOK INTO USING np.argsort or np.argmin
             smallest[i][k-1] = distance[i][j]
             nn[i][k-1] = j #THIS IS WRONG
             smallest[i] = np.sort(smallest[i]) 
         #print("The distance for",i," ",j,":",distance[i][j])
-        print(i, " The smallest distances: ", smallest[i],"---- The nearest neighbors: ",nn[i])
+        time.sleep(0.001)
+        print(i, " The smallest distances: ", smallest[i])#,"---- The nearest neighbors: ",nn[i])
 
 """ 
 #Loop through feature
