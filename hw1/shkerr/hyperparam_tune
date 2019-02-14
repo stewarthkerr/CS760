@@ -1,0 +1,2 @@
+#!/bin/bash
+python3 ./hp_tune.py -kmax $1 -train $2 -val $3 -test $4
