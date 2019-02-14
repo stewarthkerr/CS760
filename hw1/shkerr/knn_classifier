@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 ./scripts/knn.py -k $1 -train $2 -test $3
+python3 ./knn.py -k $1 -train $2 -test $3
