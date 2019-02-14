@@ -3,9 +3,6 @@ import json
 import numpy as np
 import sys
 import argparse
-test = "./data/votes_test.json"
-train = "./data/votes_train.json"
-k = 10
 
 parser = argparse.ArgumentParser(description='Implement a k-NN algorithm')
 parser.add_argument("-k", type=int, help="Number of nearest neighbors to look for in choose(n,k)")
