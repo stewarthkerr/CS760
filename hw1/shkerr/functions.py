@@ -19,23 +19,28 @@ def knn(k,train,test):
     cat_feat = []
     for feat in range(0,nFeat):
         if metadata[feat][1] == 'numeric':
-            sum = np.sum(train.T[feat], axis = 0) #sums all observations for a specific feature
-            mean = sum/nTrain 
-            sqerror = np.sum((train.T[feat]-mean)**2)
-            stddev = np.sqrt(sqerror/nTrain)
-            if stddev == 0: 
-                stddev = 1.0
-            train[:][feat] = (train[:][feat] - mean)/stddev #standardize train set
-            test[:][feat] = (test[:][feat] - mean)/stddev   #standardize test set
             num_feat.append(feat) #Builds a list of the indices of numericFeatures
         else:
             cat_feat.append(feat) #Builds a list of categorical features
-
+    
     #Split array into numeric and categorical
     train_num = train[:, num_feat]
+    train_num = train_num.astype(float)
     train_cat = train[:, cat_feat]
     test_num = test[:, num_feat]
+    test_num = test_num.astype(float)
     test_cat = test[:, cat_feat]
+
+    #Standardize numeric features
+    for feat in num_feat:
+        sum = np.sum(train_num.T[feat], axis = 0) #sums all observations for a specific feature
+        mean = sum/nTrain 
+        sqerror = np.sum((train_num.T[feat]-mean)**2)
+        stddev = np.sqrt(sqerror/nTrain)
+        if stddev == 0: 
+            stddev = 1.0
+        train_num.T[feat][:] = (train_num.T[feat][:] - mean)/stddev #standardize train set
+        test_num.T[feat][:] = (test_num.T[feat][:] - mean)/stddev   #standardize test set
 
     #Alg to find kNN
     distance = np.zeros((nTest,nTrain))
@@ -148,23 +153,28 @@ def knn_lc(k,train,test, perc = 100):
     cat_feat = []
     for feat in range(0,nFeat):
         if metadata[feat][1] == 'numeric':
-            sum = np.sum(train.T[feat], axis = 0) #sums all observations for a specific feature
-            mean = sum/nTrain 
-            sqerror = np.sum((train.T[feat]-mean)**2)
-            stddev = np.sqrt(sqerror/nTrain)
-            if stddev == 0: 
-                stddev = 1.0
-            train[:][feat] = (train[:][feat] - mean)/stddev #standardize train set
-            test[:][feat] = (test[:][feat] - mean)/stddev   #standardize test set
             num_feat.append(feat) #Builds a list of the indices of numericFeatures
         else:
             cat_feat.append(feat) #Builds a list of categorical features
-
+    
     #Split array into numeric and categorical
     train_num = train[:, num_feat]
+    train_num = train_num.astype(float)
     train_cat = train[:, cat_feat]
     test_num = test[:, num_feat]
+    test_num = test_num.astype(float)
     test_cat = test[:, cat_feat]
+
+    #Standardize numeric features
+    for feat in num_feat:
+        sum = np.sum(train_num.T[feat], axis = 0) #sums all observations for a specific feature
+        mean = sum/nTrain 
+        sqerror = np.sum((train_num.T[feat]-mean)**2)
+        stddev = np.sqrt(sqerror/nTrain)
+        if stddev == 0: 
+            stddev = 1.0
+        train_num.T[feat][:] = (train_num.T[feat][:] - mean)/stddev #standardize train set
+        test_num.T[feat][:] = (test_num.T[feat][:] - mean)/stddev   #standardize test set
 
     #Alg to find kNN
     distance = np.zeros((nTest,nTrain))
