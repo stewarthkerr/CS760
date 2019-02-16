@@ -51,6 +51,7 @@ def knn(k,train,test):
                 #Calculate numeric distance
                 distance[i] += abs(test_num[i][feat]-train_num.T[feat][:])
             else:
+                #Calculate categorical distance
                 #Get an array of differences
                 cat_diff = np.not_equal(test_cat[i][feat], train_cat.T[feat][:], dtype = object)
                 #Add distance back into distance array
@@ -111,5 +112,18 @@ def predict_label(train,test,nn):
             num_votes = nn_label.count(x) #Count number of votes for l label
             if num_votes > highest_votes:
                 highest_votes = num_votes
-                winners.append(x)
+                leading_label = x
+        winners.append(leading_label)
     return(winners)
+
+def calculate_accuracy(val,winners):
+    metadata = np.array(val['metadata']['features'])
+    nFeat = len(metadata)-1 #-1 to remove label
+    val = np.array(val['data'])
+    truth = val.T[nFeat][:]
+    correct = np.sum(winners == truth)
+    accuracy = correct / len(truth)
+    return(accuracy)
+
+
+
