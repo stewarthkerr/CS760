@@ -1,0 +1,2 @@
+#!/bin/bash
+python3 ./roc.py -k $1 -train $2 -test $3

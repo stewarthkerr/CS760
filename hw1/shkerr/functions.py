@@ -15,20 +15,18 @@ def knn(k,train,test):
     #Compute mean for each feature from training set (only for continuous features)
     #Compute stddev for each feature from training set (only for numeric)
     #Split numeric and categorical features
-    mean = np.zeros((nFeat))
-    stddev = np.zeros((nFeat))
     num_feat = []
     cat_feat = []
     for feat in range(0,nFeat):
         if metadata[feat][1] == 'numeric':
             sum = np.sum(train.T[feat], axis = 0) #sums all observations for a specific feature
-            mean[feat] = sum/nTrain 
-            sqerror = np.sum((train.T[feat]-mean[feat])**2)
-            stddev[feat] = np.sqrt(sqerror/nTrain)
-            if stddev[feat] == 0: 
-                stddev[feat] = 1
-            #train[:][feat] = (train[:][feat] - mean[feat])/stddev[feat] #standardize train set
-            #test[:][feat] = (test[:][feat] - mean[feat])/stddev[feat]   #standardize test set
+            mean = sum/nTrain 
+            sqerror = np.sum((train.T[feat]-mean)**2)
+            stddev = np.sqrt(sqerror/nTrain)
+            if stddev == 0: 
+                stddev = 1.0
+            train[:][feat] = (train[:][feat] - mean)/stddev #standardize train set
+            test[:][feat] = (test[:][feat] - mean)/stddev   #standardize test set
             num_feat.append(feat) #Builds a list of the indices of numericFeatures
         else:
             cat_feat.append(feat) #Builds a list of categorical features
@@ -146,20 +144,18 @@ def knn_lc(k,train,test, perc = 100):
     #Compute mean for each feature from training set (only for continuous features)
     #Compute stddev for each feature from training set (only for numeric)
     #Split numeric and categorical features
-    mean = np.zeros((nFeat))
-    stddev = np.zeros((nFeat))
     num_feat = []
     cat_feat = []
     for feat in range(0,nFeat):
         if metadata[feat][1] == 'numeric':
             sum = np.sum(train.T[feat], axis = 0) #sums all observations for a specific feature
-            mean[feat] = sum/nTrain 
-            sqerror = np.sum((train.T[feat]-mean[feat])**2)
-            stddev[feat] = np.sqrt(sqerror/nTrain)
-            if stddev[feat] == 0: 
-                stddev[feat] = 1
-            #train[:][feat] = (train[:][feat] - mean[feat])/stddev[feat] #standardize train set
-            #test[:][feat] = (test[:][feat] - mean[feat])/stddev[feat]   #standardize test set
+            mean = sum/nTrain 
+            sqerror = np.sum((train.T[feat]-mean)**2)
+            stddev = np.sqrt(sqerror/nTrain)
+            if stddev == 0: 
+                stddev = 1.0
+            train[:][feat] = (train[:][feat] - mean)/stddev #standardize train set
+            test[:][feat] = (test[:][feat] - mean)/stddev   #standardize test set
             num_feat.append(feat) #Builds a list of the indices of numericFeatures
         else:
             cat_feat.append(feat) #Builds a list of categorical features
@@ -191,5 +187,3 @@ def knn_lc(k,train,test, perc = 100):
         smallest = np.argsort(distance[i], axis = 0, kind = "mergesort")
         nn[i] = smallest[0:k]
     return(nn,nTrain)
-
-
