@@ -41,6 +41,9 @@ opt_k = np.argmax(accuracy)
 print(opt_k)
 
 #Find accuracy on test set
+#Train on train + val
+for i in val['data']:
+    train['data'].append(i)
 nn = knn(opt_k,train,test)
 winners = predict_label(train,test,nn)
 test_accuracy = calculate_accuracy(test,winners)
