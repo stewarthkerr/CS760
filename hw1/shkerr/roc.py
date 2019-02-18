@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import argparse
-from functions import knn_roc, calculate_accuracy, predict_label
+from functions import roc_knn, calculate_accuracy, predict_label
 
 parser = argparse.ArgumentParser(description='Implement a k-NN algorithm')
 parser.add_argument("-k", type=int, help="Number of nearest neighbors to look for in choose(n,k)")
@@ -22,8 +22,9 @@ with open(test,"r") as read_file:
     test = json.load(read_file)
 
 
-#nn = knn_roc(k,train,test)
-#print(nn)
+nn = roc_knn(k,train,test)
+print(nn[0][1])
+print(nn[1])
 """
 let be the test-set instances sorted according to predicted confidence
 c (i) that each instance is positive
