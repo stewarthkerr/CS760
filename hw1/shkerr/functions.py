@@ -262,7 +262,71 @@ def roc_knn(k,train,test):
         #Now, sort by distance and select k nearest neighbors
         smallest = np.argsort(distance[i], axis = 0, kind = "mergesort")
         weight = 1/(epsilon + distance[i]**2)
-        nn_weights[i] = (-weight).sort()
         nn[i] = smallest[0:k]
-    return(nn,weight)
+        nn_weights[i] = weight[nn[i]] #Pull the weights for the nearest neighbors
+    return(nn,nn_weights)
+
+#function to calculate confidence values that y == 1
+def calculate_conf(nn,nn_weights,train,test):
+    #Convert json to array and populate useful variables
+    metadata = np.array(train['metadata']['features'])
+    train = np.array(train['data'])
+    test = np.array(test['data'])
+    nTest = len(test)
+    nTrain = len(train)
+    nFeat = len(metadata)-1 #-1 to remove label
+    positive = metadata[nFeat][1][0]
+    trainLabels = train.T[nFeat][:]
+    conf = np.zeros(nTest, dtype = float)
+
+    #Loop through each test instance in nn[]
+    for i in range(0,nTest):
+        #Sum up numerator = y_i * w_i
+        truth = (trainLabels[nn[i]] == positive) 
+        truth = truth.astype(float) #Returns 1 if y_i matches the positive class
+        num = sum(nn_weights[i] * truth)
+        denom = sum(nn_weights[i])
+        conf[i] = num/denom
+    return(conf)
+
+def calculate_roc(test,conf):
+    metadata = np.array(test['metadata']['features'])
+    test = np.array(test['data'])
+    nTest = len(test)
+    nFeat = len(metadata)-1 #-1 to remove label
+    testLabels = test.T[nFeat][:]
+    positive = metadata[nFeat][1][0]
+    num_pos = np.sum(testLabels == positive)
+    num_neg = np.sum(testLabels != positive)
+
+    #combine conf and testLabels and sort
+    confSort = np.argsort(conf, kind = "mergesort")
+    confLabels = np.array((conf[confSort],testLabels[confSort]))
+    confLabels = confLabels.T[::-1]
+
+    #Generate TP and FP
+    TP = 0 
+    FP = 0
+    last_TP = 0
+    for i in range(0,nTest):
+        #Print first coordinate
+        if i == 0:
+            print(0,0,sep=',')
+        # find thresholds where there is a pos instance on high side, neg instance on low side
+        if (i > 0) and (confLabels[i][0] != confLabels[i-1][0]) and not(confLabels[i][1] == positive ) and (TP > last_TP):
+            FPR = FP / num_neg
+            TPR = TP / num_pos
+            last_TP = TP
+            print(FPR,TPR,sep=',')
+        if confLabels[i][1] == positive:
+            TP += 1
+        else:
+            FP += 1
+    FPR = FP / num_neg 
+    TPR = TP / num_pos
+    #Print last coordinate
+    print(FPR,TPR,sep=',')
+
+    return()
+
 
