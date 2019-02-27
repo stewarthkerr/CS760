@@ -57,7 +57,7 @@ Compute the probability: $P(d | b, \neg a, j, m)$.
 
 \begin{figure}[h]
 \centering
-\includegraphics[scale=0.5]{p1}
+\includegraphics[scale=0.5]{figs/p1}
 \label{fig:q1}
 \end{figure}
 
@@ -85,18 +85,60 @@ You need to answer the following two questions.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{p2}
+\includegraphics[scale=0.5]{figs/p2}
 \label{fig:q2}
 \end{figure}
 
 \begin{enumerate}
 \item (2 pts) Construct the conditional probability tables (CPTs) based on the above sample count tables, using maximum likelihood estimation. You need to both show the true probability \texttt{P\textsubscript{true}} and false probability P\textsubscript{false} for each case, and organize them in the format of \texttt{<P\textsubscript{true}, P\textsubscript{false}>}. For example, for the case \texttt{Y|X\textsubscript{1},X\textsubscript{2}}, your answer will look like \texttt{<P(Y|X\textsubscript{1},X\textsubscript{2}), P($\neg$Y|X\textsubscript{1},X\textsubscript{2})>}. Keep \textbf{at least 3 digits of precision.} (You may reuse the same structure as the above tables, just plugging in the conditional probabilities in the place of sample counts. For more information, please refer to the lecture notes \texttt{BNs-1.pdf})
 
+\begin{soln}
+See the figure below for the CPT tables.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.80]{figs/p2_ans}
+\label{fig:q2_ans}
+\end{figure}
+
+\end{soln}
+
 
 
 \vspace{10pt}
 
 \item (10 pts) Show the result of one cycle of the EM algorithm to update the CPTs you derived in step (a), using 10 another instances with \texttt{A=true}, \texttt{B=false}, \texttt{C=?}, and \texttt{D=true} (`?' means missing value). Keep \textbf{at least 2 digits of precision}.
+
+\begin{soln}
+The EM algorithm has two steps - \\
+E) Using the current CPT, calculate expected values of the missing data. \\
+M) Update the model using the imputed values from E which maximize probability of the data
+
+\textbf{Expectation step}
+Given the CPT tables constructed above, we have 
+\[P(c | a, \neg b, d) = \frac{P(a,\neg b, c, d}{P(a,\neg b, c, d) + P(a,\neg b, \neg c, d)} = \frac{0.540\times0.548\times0.511\times0.451}{(0.540\times0.548\times0.511\times0.451) + (0.540\times0.548\times0.489\times0.512)}\]\[= 0.479\]
+and
+\[P(\neg c | a, \neg b, d) = 1 - P(c | a, \neg b, d) = 1 - 0.479 = 0.521\]
+Thus, the expected counts for c and $\neg c$ using another 10 instances are $10\times0.479 = 4.79$ and $10\times 0.521 = 5.21$ respectively. \\
+
+\textbf{Maximization step}
+In the maximization step, we add the new data (with expected counts) to the previous counts and then recalculate the CPT table.
+After adding the new data, the counts table is:
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.50]{figs/p2_ans2}
+\label{fig:q2_ans2}
+\end{figure}
+
+\pagebreak
+Thus, the new CPT table is:
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.50]{figs/p2_ans3}
+\label{fig:q2_ans3}
+\end{figure}
+
+\end{soln}
 
 
 
