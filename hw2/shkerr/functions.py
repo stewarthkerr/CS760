@@ -24,14 +24,14 @@ def naive(train,test):
 
     # For each feature and each value of feature
     # calculate P(x|y)
-    cond_prob = [[]]
+    cond_prob = metadata[0:nFeat]
     for i in range(0,nFeat):
         featValues = metadata[i][1] #Pulls values for this label
-        for v in featValues:
+        num_featValues = len(featValues)
+        for v in range(0,num_featValues):
             trainFeat = train_pos.T[i][:]
-            obs_num_pos = train_pos[ trainFeat == v]
-            cond_prob = len(obs_num_pos)/num_pos 
-            print(v,"  ",cond_prob)
-
+            obs_num_pos = train_pos[trainFeat == featValues[v]]
+            p = len(obs_num_pos)/num_pos 
+            cond_prob[i][1][v] = p
 
     return num_neg
