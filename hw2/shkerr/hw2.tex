@@ -116,7 +116,7 @@ M) Update the model using the imputed values from E which maximize probability o
 
 \textbf{Expectation step}
 Given the CPT tables constructed above, we have 
-\[P(c | a, \neg b, d) = \frac{P(a,\neg b, c, d}{P(a,\neg b, c, d) + P(a,\neg b, \neg c, d)} = \frac{0.540\times0.548\times0.511\times0.451}{(0.540\times0.548\times0.511\times0.451) + (0.540\times0.548\times0.489\times0.512)}\]\[= 0.479\]
+\[P(c | a, \neg b, d) = \frac{P(a,\neg b, c, d)}{P(a,\neg b, c, d) + P(a,\neg b, \neg c, d)} = \frac{0.540\times0.548\times0.511\times0.451}{(0.540\times0.548\times0.511\times0.451) + (0.540\times0.548\times0.489\times0.512)}\]\[= 0.479\]
 and
 \[P(\neg c | a, \neg b, d) = 1 - P(c | a, \neg b, d) = 1 - 0.479 = 0.521\]
 Thus, the expected counts for c and $\neg c$ using another 10 instances are $10\times0.479 = 4.79$ and $10\times 0.521 = 5.21$ respectively. \\

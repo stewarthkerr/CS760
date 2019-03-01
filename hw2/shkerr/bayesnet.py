@@ -23,7 +23,6 @@ with open(test,"r") as read_file:
 
 if bntype == 'n':
     naive(train,test)
-    print('naive')
 elif bntype == 't':
     #Do TAN
     print('TAN')
