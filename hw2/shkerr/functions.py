@@ -122,7 +122,6 @@ def tan(train,test):
             y2cond_prob_temp2 = []
             noty2cond_prob_temp2 = []
             for j in range(0,nFeat):
-                print(i,j)
                 jfeatValues = metadata[j][1]
                 jnum_featValues = len(jfeatValues)
                 jposFeat = pos_obs.T[j][:]
@@ -133,8 +132,8 @@ def tan(train,test):
                     jpos_obs = pos_obs[jposFeat == jfeatValues[w]]
                     jneg_obs = neg_obs[jnegFeat == jfeatValues[w]]
                     # Maybe need to multiply by 2 in the denominator
-                    jpos_obs_prob = (len(jpos_obs)+1)/(num_pos+(2*jnum_featValues*num_featValues))
-                    jneg_obs_prob = (len(jneg_obs)+1)/(num_neg+(2*jnum_featValues*num_featValues))
+                    jpos_obs_prob = (len(jpos_obs)+1)/(num_pos+(jnum_featValues*num_featValues))
+                    jneg_obs_prob = (len(jneg_obs)+1)/(num_neg+(jnum_featValues*num_featValues))
                     y2cond_prob_temp.append(jpos_obs_prob)
                     noty2cond_prob_temp.append(jneg_obs_prob)
                 y2cond_prob_temp2.append(y2cond_prob_temp)
@@ -146,15 +145,34 @@ def tan(train,test):
         y2cond_prob.append(y2cond_prob_temp3)
         noty2cond_prob.append(noty2cond_prob_temp3)
 
-    yeet = np.array(y2cond_prob)
-    print(yeet[0][0][0][0])
-    print(ycond_prob[0][0])
+    #Now, to calculate mutual info
+    mutual_info = np.zeros((nFeat,nFeat))
+    for i in range(0,nFeat):
+        ifeatValues = metadata[i][1] #Pulls values for this label
+        inum_featValues = len(featValues)
+        for j in range(0,nFeat):
+            jfeatValues = metadata[j][1]
+            jnum_featValues = len(jfeatValues)
+            total_mutual_info = 0
+            for v in range(0,inum_featValues):
+                icond_prob = ycond_prob[i][v]
+                inotcond_prob = notycond_prob[i][v]
+                for w in range(0,jnum_featValues):
+                    jcond_prob = ycond_prob[j][w]
+                    jnotcond_prob = notycond_prob[j][w]
+                    ijcond_prob = y2cond_prob[i][v][j][w]
+                    ijnotcond_prob = y2cond_prob[i][v][j][w]
+                    ij_prob = ijcond_prob*perc_pos
+                    ijnot_prob = ijnotcond_prob*perc_neg
+                    ymutual_info = ij_prob*np.log2(ijcond_prob/(icond_prob*jcond_prob))
+                    notymutual_info = ijnot_prob*np.log2(ijnotcond_prob/(inotcond_prob*jnotcond_prob))
+                    total_mutual_info += ymutual_info+notymutual_info
+            mutual_info[i][j] = total_mutual_info
 
-    #Now, to calculate fisher info
-    #fisher = np.zeros((nFeat,nFeat))
-    #for i in range(0,nFeat):
-    #    for j in range(0,nFeat):
-    #        yeet[i]
+                
+
+                    
+
             
 
     return
