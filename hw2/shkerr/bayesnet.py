@@ -3,7 +3,9 @@ import json
 import numpy as np
 import sys
 import argparse
-from functions import naive
+import scipy as sp
+import pandas
+from functions import naive, tan
 
 parser = argparse.ArgumentParser(description='Implements a Bayes net')
 parser.add_argument('-train', type = str, help='Train data set path')
@@ -24,7 +26,6 @@ with open(test,"r") as read_file:
 if bntype == 'n':
     naive(train,test)
 elif bntype == 't':
-    #Do TAN
-    print('TAN')
+    tan(train,test)
 else:
     print("3rd argument bntype is not valid. Expect 'n' or 't'.")
