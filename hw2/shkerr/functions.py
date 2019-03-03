@@ -69,8 +69,9 @@ def naive(train,test):
         else:
             print(negative, obs[nFeat], "{:10.12f}".format(1-pygx))
             if negative == obs[nFeat]: num_correct += 1
-        
-    print('\n' , num_correct, '\n')
+
+    print()    
+    print(num_correct,'\n')
 
     return 
 
@@ -149,7 +150,7 @@ def tan(train,test):
     mutual_info = np.zeros((nFeat,nFeat))
     for i in range(0,nFeat):
         ifeatValues = metadata[i][1] #Pulls values for this label
-        inum_featValues = len(featValues)
+        inum_featValues = len(ifeatValues)
         for j in range(0,nFeat):
             jfeatValues = metadata[j][1]
             jnum_featValues = len(jfeatValues)
@@ -161,7 +162,7 @@ def tan(train,test):
                     jcond_prob = ycond_prob[j][w]
                     jnotcond_prob = notycond_prob[j][w]
                     ijcond_prob = y2cond_prob[i][v][j][w]
-                    ijnotcond_prob = y2cond_prob[i][v][j][w]
+                    ijnotcond_prob = noty2cond_prob[i][v][j][w]
                     ij_prob = ijcond_prob*perc_pos
                     ijnot_prob = ijnotcond_prob*perc_neg
                     ymutual_info = ij_prob*np.log2(ijcond_prob/(icond_prob*jcond_prob))
@@ -169,11 +170,87 @@ def tan(train,test):
                     total_mutual_info += ymutual_info+notymutual_info
             mutual_info[i][j] = total_mutual_info
 
-                
+    # Prim's algorithm  
+    # initialize empty edges array and empty MST
+    vertex = 0   # initial vertex is first feature
+    MST = []
+    edges = []
+    visited = []
+    maxEdge = [None,None,0]
+  
+    # run prims algorithm until we create an MST
+    # that contains every vertex from the graph
+    while len(MST) != nFeat-1:
+        # mark this vertex as visited
+        visited.append(vertex)
+        # add each edge to list of potential edges
+        for r in range(0, nFeat):
+            if mutual_info[vertex][r] != 0:
+                edges.append([vertex,r,mutual_info[vertex][r]])
+        # find edge with the largest mutual info to a vertex
+        # that has not yet been visited
+        for e in range(0, len(edges)):
+            if edges[e][2] > maxEdge[2] and edges[e][1] not in visited:
+                maxEdge = edges[e]
+        # remove max weight edge from list of edges
+        edges.remove(maxEdge)
+        # push max edge to MST
+        MST.append(maxEdge)
+        # start at new vertex and reset max edge
+        vertex = maxEdge[1]
+        maxEdge = [None,None,0]
+    
+    #Add direction to graph and add class
+    directed_MST = dict()
+    for i in range(0,len(MST)):
+        vertex = MST[i][0]
+        direction = MST[i][1]
+        if direction in directed_MST:
+            directed_MST[direction].append(vertex)
+        else:
+            directed_MST[direction] = [vertex]
 
-                    
+    #Add an edge from class to each feature
+    for i in range(0,nFeat):
+        if i in directed_MST:
+            directed_MST[i].append(nFeat)
+        else:
+            directed_MST[i] = [nFeat]
+    
+    #Now, I want to output the tree structure
+    for i in range(0,nFeat):
+        feature = metadata[i][0]
+        parents = directed_MST[i]
+        if len(parents) == 2:
+            parent1 = metadata[parents[0]][0]
+            parent2 = metadata[parents[1]][0]
+            print(feature, parent1, parent2)
+        else:
+            parent1 = metadata[parents][0][0]
+            print(feature, parent1)
+    print()
 
-            
+    #Classification
+    num_correct = 0
+    for i in range(0,nTest):
+        obs = test[i]
+        pypxgy = perc_pos
+        pnypxgny = perc_neg
+        for j in range(0,nFeat):
+            testfeat = obs[j]
+            index = metadata[j][1].index(testfeat)
+            pypxgy = pypxgy * ycond_prob[j][index]
+            pnypxgny = pnypxgny * notycond_prob[j][index]
+        pygx = (pypxgy)/(pypxgy+pnypxgny)
+        if pygx >= 0.5:
+            print(positive, obs[nFeat], "{:10.12f}".format(pygx))
+            if positive == obs[nFeat]: num_correct += 1
+        else:
+            print(negative, obs[nFeat], "{:10.12f}".format(1-pygx))
+            if negative == obs[nFeat]: num_correct += 1
+     
+    print()
+    print(num_correct,'\n')
 
     return
 
