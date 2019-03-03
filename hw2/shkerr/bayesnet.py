@@ -3,8 +3,6 @@ import json
 import numpy as np
 import sys
 import argparse
-import scipy as sp
-import pandas
 from functions import naive, tan
 
 parser = argparse.ArgumentParser(description='Implements a Bayes net')

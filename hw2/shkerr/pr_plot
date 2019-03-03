@@ -1,0 +1,1 @@
+python ./pr_plot.py -train $1 -test $2 -bntype $3
