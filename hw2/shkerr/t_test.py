@@ -24,7 +24,3 @@ for i in range(0,10):
     test = split[1]
     accuracy.append(ttest(train,test,metadata))
 
-
-
-
-
