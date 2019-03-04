@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import argparse
-from functions import naive, tan
+from functions import ttest, split_data
 
 parser = argparse.ArgumentParser(description='T-test to see if TAN and naive are different')
 parser.add_argument('-data', type = str, help='Data set path')
@@ -16,17 +16,15 @@ with open(data,"r") as read_file:
     data = json.load(read_file)
 metadata = np.array(data['metadata']['features'])
 
-#This splits the data into k-sections
-def split_data(data,pos,k=10):
-    assert pos <= k, "3rd argument must be less than or equal to 2nd argument"
-    full = np.array(data['data'])
-    split = np.array_split(full, k)
-    test = split[pos]
-    index = []
-    for i in range(1,k+1):
-        if i != pos:
-            index.append(i-1)
-    train = np.concatenate([split[i] for i in index])
-    split = [train,test]
-    return split
+#Build a list of list containing accuracy for naive and TAN
+accuracy = []
+for i in range(0,10):
+    split = split_data(data,i,10)
+    train = split[0]
+    test = split[1]
+    accuracy.append(ttest(train,test,metadata))
+
+
+
+
 
