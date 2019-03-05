@@ -145,9 +145,30 @@ Thus, the new CPT table is:
 
 \item  (15 pts) Plot a precision/recall curve for both methods (NB and TAN) and answer the following question:
 \begin{enumerate}
-\item Compare the two curves, and make a comment about which method (NB or TAN) seems to have more predictive power. Explain why you think that (i.e. what features of the precision/recall curve lead you to this conclusion?).
+\item Compare the two curves, and make a comment about which method (NB or TAN) seems to have more predictive power. Explain why you think that (i.e. what features of the precision/recall curve lead you to this conclusion?) \\ 
+\begin{soln}
+I will include a plot of each method and then a combined plot of both methods. Note that I used a step method with 100 steps between a decision threshold of 0.00 and 1.00 to make my PR curves. This yields a PR-curve with slightly less resolution but it was quicker for me to construct.
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.50]{figs/pr_curve_naive}
+\label{fig:pr_curve_naive}
+
+\centering
+\includegraphics[scale=0.50]{figs/pr_curve_tan}
+\label{fig:pr_curve_tan}
+
+\centering
+\includegraphics[scale=0.50]{figs/pr_curve_comparison}
+\label{fig:pr_curve_comparison}
+\end{figure}
+
+If we focus on the third plot, which is a comparison of the two methods, we see that aside from decision thresholds that have high recall - (that is a low probability decision threshold) - the TAN method has better precision for a given recall. In other words, the TAN PR curve is generally higher than the NB PR curve. This means that if TAN and NB predict the same number of positive classes in a test data set, then the percent of those positive predictions that are correct is generally higher for TAN than NB. \textbf{For this reason, I will say that TAN has a higher predictive power for this data set.}
+
+\end{soln}
 
 \end{enumerate}
+\pagebreak
+
 
 \item (15 pts) Using the given data set named tic-tac-toe.json, use 10-fold cross validation to obtain 10 accuracy measures for each method. You’ll notice that tic-tac-toe.json is simply a concatenation of its given train and test files. Use these accuracies to conduct your paired t test and discover whether you accept or reject the alternative hypothesis (that the classifiers truly differ in accuracy). Specifically, calculate the accuracy deltas for each cross validation fold and report the following values/answers:
 \begin{enumerate}

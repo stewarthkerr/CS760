@@ -22,6 +22,8 @@ with open(train,"r") as read_file:
 with open(test,"r") as read_file:
     test = json.load(read_file)
 
+#I know using steps is not the best way to do this plot, but I am 
+#going to use steps in the interest of time (less time to code)
 PR_coord = []
 if bntype == 'n':
     title = "Naive Bayes Tic-tac-toe Precision-Recall Curve"
