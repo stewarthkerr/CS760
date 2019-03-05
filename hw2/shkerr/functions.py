@@ -561,9 +561,9 @@ def ttest(train,test,metadata):
         else:
             if negative == obs[nFeat]: num_correct += 1
     naive_correct = num_correct
-    correct = [naive_correct, tan_correct]
+    accuracy = [naive_correct/nTest, tan_correct/nTest]
  
-    return correct
+    return accuracy
 
 def tan(train,test):
     #Convert json to array and populate useful variables
