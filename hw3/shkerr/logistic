@@ -1,0 +1,1 @@
+python ./logistic.py -lr $1 -epoch $2 -train $3 -test $4
