@@ -64,19 +64,3 @@ class json2numpy:
         one_lab = self.metadata[self.feat_length][1][1]
         self.num_labels = (self.labels == one_lab).astype(float)
 
-
-
-#Finds the kNN
-def naive(train,test):
-    #Convert json to array and populate useful variables
-    metadata = np.array(train['metadata']['features'])
-    train = np.array(train['data'])
-    test = np.array(test['data'])
-    nTest = len(test)
-    nFeat = len(metadata)-1 #-1 to remove label
-    trainLabels = train.T[nFeat][:] #Pulls list of training data labels
-    positive = metadata[nFeat][1][0]
-    negative = metadata[nFeat][1][1]
-    num_pos = np.sum(trainLabels == positive)
-    num_neg = np.sum(trainLabels != positive)
-

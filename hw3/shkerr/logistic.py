@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import argparse
-from functions import lr_train
+from functions import lr_train, lr_predict
 from classes import json2numpy
 
 def main(args):
@@ -21,7 +21,11 @@ def main(args):
         test = json.load(read_file)
         test = json2numpy(test)
 
-    lr_train(lr,epoch,train)
+    #lr_train trains the weights for the logistic regression
+    w = lr_train(lr,epoch,train)
+
+    #lr_predict predicts classes for test set
+    predictions = lr_predict(test,w)
 
 
 if __name__ == "__main__": 
