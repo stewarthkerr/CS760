@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import argparse
-#from functions import naive, tan
+from functions import lr_train
 from classes import json2numpy
 
 def main(args):
@@ -13,18 +13,16 @@ def main(args):
     test = args.test
     test = test.replace('\r','') #Removes the carriage return cuz I use windows
 
-    #Load the data in
+    #Load the data in and convert to numpy
     with open(train,"r") as read_file:
         train = json.load(read_file)
         train = json2numpy(train)
-        train.standardize_num()
     with open(test,"r") as read_file:
         test = json.load(read_file)
         test = json2numpy(test)
-        test.standardize_num()
 
-    
-    
+    lr_train(lr,epoch,train)
+
 
 if __name__ == "__main__": 
     np.random.seed(0)
