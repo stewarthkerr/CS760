@@ -143,6 +143,53 @@ def nn_train(lr,n_hu,epoch,train,screen_print = 1):
     #Return the trained weights    
     return(w_i_h, w_h_o)
 
+def nn_predict(test,w, screen_print = 1):
+    w_i_h = w[0]
+    w_h_o = w[1]
+    #loop through test
+    num_correct = 0
+    TP = FP = TN = FN = 0
+    predictions = np.zeros(test.length)
+    for i in range(0,test.length):
+        a1 = np.sum(w_i_h*test.pp_data[i], axis = 1)
+        a1 = 1/(1+np.exp(-a1)) #Activation of hidden units
+        hu = np.insert(a1,0,1.0) #prepend bias unit
+
+        a2 = np.sum(w_h_o*hu)
+        a2 = 1/(1+np.exp(-a2))
+        true_class = test.num_labels[i].astype(int)
+        if a2 >= 0.5:
+            pred_class = 1
+            predictions[i] = 1
+            if true_class == 1:
+                TP += 1
+            else:
+                FP += 1
+        else:
+            pred_class = 0
+            predictions[i] = 0
+            if true_class == 0:
+                TN += 1
+            else:
+                FN += 1
+
+        #If we want to print to screen
+        if screen_print:
+            print(a2, pred_class, true_class)
+    
+    #Now that we've looped through all test instances, print total num correct
+    if screen_print:
+        print(TP+TN, test.length-(TP+TN))
+    
+    #Calculate/print F1 score
+    precision = TP/(TP+FP)
+    recall = TP/(TP+FN)
+    F1 = 2*precision*recall/(precision+recall)
+    if screen_print:
+        print(F1)
+
+    return(predictions)
+
 
 
             

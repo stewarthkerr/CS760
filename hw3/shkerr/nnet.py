@@ -3,7 +3,7 @@ import json
 import numpy as np
 import sys
 import argparse
-from functions import nn_train
+from functions import nn_train, nn_predict
 from classes import json2numpy
 
 def main(args):
@@ -26,7 +26,7 @@ def main(args):
     w = nn_train(lr,n_hu,epoch,train)
 
     #lr_predict predicts classes for test set
-    #predictions = lr_predict(test,w)
+    predictions = nn_predict(test,w)
 
 
 if __name__ == "__main__": 
