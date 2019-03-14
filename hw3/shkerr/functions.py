@@ -80,13 +80,23 @@ def lr_predict(test,w, screen_print = 1):
         print(TP+TN, test.length-(TP+TN))
     
     #Calculate/print F1 score
-    precision = TP/(TP+FP)
-    recall = TP/(TP+FN)
-    F1 = 2*precision*recall/(precision+recall)
+    if (TP+FP) != 0:
+        precision = TP/(TP+FP)
+    else:
+        precision = 0
+
+    if (TP+FN) != 0:
+        recall = TP/(TP+FN)
+    else:
+        recall = 0
+    if (precision+recall) != 0:
+        F1 = 2*precision*recall/(precision+recall)
+    else:
+        F1 = 0.0
     if screen_print:
         print(F1)
 
-    return(predictions)
+    return(predictions, F1)
 
 def nn_train(lr,n_hu,epoch,train,screen_print = 1):
     #Initialize weights and hidden units vector
@@ -182,20 +192,22 @@ def nn_predict(test,w, screen_print = 1):
         print(TP+TN, test.length-(TP+TN))
     
     #Calculate/print F1 score
-    precision = TP/(TP+FP)
-    recall = TP/(TP+FN)
-    F1 = 2*precision*recall/(precision+recall)
+    if (TP+FP) != 0:
+        precision = TP/(TP+FP)
+    else:
+        precision = 0
+
+    if (TP+FN) != 0:
+        recall = TP/(TP+FN)
+    else:
+        recall = 0
+    if (precision+recall) != 0:
+        F1 = 2*precision*recall/(precision+recall)
+    else:
+        F1 = 0.0
     if screen_print:
         print(F1)
 
-    return(predictions)
+    return(predictions, F1)
 
-
-
-            
-
-
-
-
-
-
+    
