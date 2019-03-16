@@ -18,9 +18,11 @@ def main(args):
     with open(train,"r") as read_file:
         train = json.load(read_file)
         train = json2numpy(train)
+        train = train.train_pp()
     with open(test,"r") as read_file:
         test = json.load(read_file)
         test = json2numpy(test)
+        test = test.test_pp(train)
 
     #lr_train trains the weights for the logistic regression
     w = nn_train(lr,n_hu,epoch,train)

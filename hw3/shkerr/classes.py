@@ -25,24 +25,25 @@ class json2numpy:
         self.numeric = num_feat
         self.categorical = cat_feat
 
-        # One hot encoding & normalizing
-        # This replaces each categorical feature with a set of columns
-        # (one for each label in feature) where 1 = that observation
-        # has that particular label for that particular feature
+    # One hot encoding & normalizing
+    # This replaces each categorical feature with a set of columns
+    # (one for each label in feature) where 1 = that observation
+    # has that particular label for that particular feature
+    def train_pp(self):
         feature_vectors = [np.ones(self.length, dtype = float)] #ones handle the intercept
         for feat in range(0,self.feat_length):
 
             #If feature is numeric, we want to normalize
             if feat in self.numeric:
-                    cat_values = (self.data.T[feat]).astype(float)
-                    sum = np.sum(cat_values, axis = 0)
+                    num_values = (self.data.T[feat]).astype(float)
+                    sum = np.sum(num_values, axis = 0)
                     mean = sum/self.length
-                    sqerror = np.sum((cat_values-mean)**2)
+                    sqerror = np.sum((num_values-mean)**2)
                     stddev = np.sqrt(sqerror/self.length)
                     if stddev == 0: 
                         stddev = 1.0
                     #Standardize the set
-                    feature_vectors.append((cat_values - mean)/stddev)
+                    feature_vectors.append((num_values - mean)/stddev)
 
             #Else, the feature is categorical and we want one-hot encoding
             else:
@@ -64,3 +65,44 @@ class json2numpy:
         one_lab = self.metadata[self.feat_length][1][1]
         self.num_labels = (self.labels == one_lab).astype(float)
 
+        return(self)
+
+    #Standardizes test set
+    def test_pp(self,train):
+        feature_vectors = [np.ones(self.length, dtype = float)] #ones handle the intercept
+        for feat in range(0,self.feat_length):
+
+            #If feature is numeric, we want to normalize
+            if feat in self.numeric:
+                    num_values = (train.data.T[feat]).astype(float)
+                    sum = np.sum(num_values, axis = 0)
+                    mean = sum/train.length
+                    sqerror = np.sum((num_values-mean)**2)
+                    stddev = np.sqrt(sqerror/train.length)
+                    if stddev == 0: 
+                        stddev = 1.0
+                    #Standardize the set
+                    test_values = (self.data.T[feat]).astype(float)
+                    feature_vectors.append((test_values - mean)/stddev)
+
+            #Else, the feature is categorical and we want one-hot encoding
+            else:
+                cat_values = (self.data.T[feat])
+                num_cat_values = len(self.metadata[feat][1])
+                #Split the one-hot encoding so we have one row per feat per value
+                for i in range(0,num_cat_values):
+                    value_label = self.metadata[feat][1][i]
+                    split_encoding = np.equal(cat_values, value_label, dtype = object).astype(float)
+                    feature_vectors.append(split_encoding)
+
+        #Pre-processed data
+        self.pp_data = np.array(feature_vectors).T
+
+        #Number of units
+        self.n_units = len(self.pp_data.T)
+
+        #Want numeric labels
+        one_lab = self.metadata[self.feat_length][1][1]
+        self.num_labels = (self.labels == one_lab).astype(float)
+
+        return(self)

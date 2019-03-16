@@ -1,6 +1,7 @@
 #!/usr/bin/python3.6
 import numpy as np
 import sys
+import math
 
 def lr_train(lr,epoch,train,screen_print = 1):
     #Initialize all weights to match hw3.pdf
@@ -39,7 +40,7 @@ def lr_train(lr,epoch,train,screen_print = 1):
 
         # If we want to print to screen, do it    
         if screen_print:
-            print(i, total_error, num_correct, train.length - num_correct)
+            print(i, "{:10.12f}".format(total_error), num_correct, train.length - num_correct)
         #Increment epoch
         i += 1
 
@@ -54,7 +55,7 @@ def lr_predict(test,w, screen_print = 1):
     for i in range(0,test.length):
         net = w*test.pp_data[i]
         net_sum = np.sum(net)
-        sigmoid = 1/(1+np.exp(-net_sum))
+        sigmoid = 1.0/(1.0+np.exp(-net_sum))
         true_class = test.num_labels[i].astype(int)
         if sigmoid >= 0.5:
             pred_class = 1
@@ -73,7 +74,7 @@ def lr_predict(test,w, screen_print = 1):
 
         #If we want to print to screen
         if screen_print:
-            print(sigmoid, pred_class, true_class)
+            print("{:10.12f}".format(sigmoid), pred_class, true_class)
     
     #Now that we've looped through all test instances, print total num correct
     if screen_print:
@@ -94,7 +95,7 @@ def lr_predict(test,w, screen_print = 1):
     else:
         F1 = 0.0
     if screen_print:
-        print(F1)
+        print("{:10.12f}".format(F1))
 
     return(predictions, F1)
 
@@ -111,13 +112,13 @@ def nn_train(lr,n_hu,epoch,train,screen_print = 1):
         #For each training instance
         for j in range(0,train.length):
             #using inputs, calculate hidden units according to initial weights
-            a1 = np.sum(w_i_h*train.pp_data[j], axis = 1)
+            a1 = np.dot(w_i_h,train.pp_data[j])
             a1 = 1/(1+np.exp(-a1)) #Activation of hidden units
             hu = np.insert(a1,0,1.0) #prepend bias unit
 
             #using hidden units, calculate expected class
-            a2 = np.sum(w_h_o*hu)
-            a2 = 1/(1+np.exp(-a2))
+            a2 = np.dot(w_h_o,hu)
+            a2 = 1/(1+np.exp(-a2[0]))
             true_class = train.num_labels[j]
             if a2 >= 0.5:
                 pred_class = 1
@@ -146,7 +147,7 @@ def nn_train(lr,n_hu,epoch,train,screen_print = 1):
 
         # If we want to print to screen, do it    
         if screen_print:
-            print(i, total_error, num_correct, train.length - num_correct)
+            print(i, "{:10.12f}".format(total_error), num_correct, train.length - num_correct)
         #Increment epoch
         i += 1
 
@@ -185,7 +186,7 @@ def nn_predict(test,w, screen_print = 1):
 
         #If we want to print to screen
         if screen_print:
-            print(a2, pred_class, true_class)
+            print("{:10.12f}".format(a2), pred_class, true_class)
     
     #Now that we've looped through all test instances, print total num correct
     if screen_print:
@@ -206,8 +207,9 @@ def nn_predict(test,w, screen_print = 1):
     else:
         F1 = 0.0
     if screen_print:
-        print(F1)
+        print("{:10.12f}".format(F1))
 
     return(predictions, F1)
+
 
     
