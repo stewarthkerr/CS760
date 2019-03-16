@@ -133,7 +133,7 @@ def nn_train(lr,n_hu,epoch,train,screen_print = 1):
 
             #calculate errors for back propagation
             output_error = a2 - true_class
-            hu_error = a1*(1-a1) * np.sum(w_h_o * output_error)
+            hu_error = a1*(1-a1) * (w_h_o[0][1:] * output_error)
 
             #calculate the gradient wrt weights 
             g2 = hu*output_error
