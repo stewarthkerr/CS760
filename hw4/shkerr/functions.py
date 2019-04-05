@@ -57,6 +57,9 @@ def bootstrap(trees,depth,train,test,display = False):
         #Print accuracy
         print()
         print(accuracy) 
+    
+    #Return the overall predictions
+    return predictions
 
 def adaboost(trees,depth,train,test,display = False): 
     """Implements the adaboost algorithm for k-class classification using a decision tree learner"""
@@ -102,13 +105,14 @@ def adaboost(trees,depth,train,test,display = False):
         #Now, to do prediction on test
         test_predictions = tree.predict(test.features, prob = False)
         test_predictions_list.T[i] = test_predictions
+
         #This is a bit of an ugly workaround
-        x = np.vstack((test_predictions,test_predictions)).T
+        x = np.tile(test_predictions,(test.label_length,1)).T
         kclass = (test_possible_labels == x).astype(float)
 
         #Creates a sum which we will use for overall classification
         cx += alpha * kclass 
-
+        
     #Classification is the class that maximizes cx
     classifications_index = np.argmax(cx, axis = 1).astype(int)
 
@@ -120,11 +124,11 @@ def adaboost(trees,depth,train,test,display = False):
     if display:
         #Print the tree training weights
         for i in range(0,train.length):
-            print(','.join(map(str,weights_list[i])))
+            print(','.join(map("{:10.12f}".format, weights_list[i])))
 
         #Print the alphas
         print()
-        print(','.join(map(str,alpha_list[:])))
+        print(','.join(map("{:10.12f}".format,alpha_list[:])))
         
         #Print the predictions
         print()
@@ -133,7 +137,33 @@ def adaboost(trees,depth,train,test,display = False):
 
         #Print accuracy
         print()
-        print(accuracy) 
+        print(accuracy)
+
+    #return overall classifications
+    return classifications
+
+def build_confusion_matrix(data, predictions, verbose = False):
+    """Builds a confusion matrix from the test data and given predictions"""
+
+    #Build a dictionary to handle str labels
+    temp_dict = dict(enumerate(data.metadata[-1][1]))
+    labels_dict = {y:x for x,y in temp_dict.items()}
+
+    #Convert labels to index (to handle strings)
+    truth = data.labels
+    predictions_index = np.vectorize(labels_dict.get)(predictions)
+    truth_index = np.vectorize(labels_dict.get)(truth)
+
+    #Build the confusion matrix and populate
+    cm = np.zeros((data.label_length,data.label_length), dtype = int)
+    np.add.at(cm, (predictions_index, truth_index), 1)
+
+    if verbose:
+        #Print out stuff for grading
+        for i in range(0,len(cm)):
+            print(','.join(map(str, cm[i])))
+    
+    return cm
         
 
 
